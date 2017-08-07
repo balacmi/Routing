@@ -16,7 +16,7 @@ import com.google.maps.model.TravelMode;
 
 
 
-public class GoogleCarRouting {
+public class GoogleRouting {
 
 	/**
 	 * 
@@ -37,7 +37,7 @@ public class GoogleCarRouting {
 	 * Coordinates should be in WGS84 format
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void carRouting(String[] args) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(args[2]));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[3]));
 		
@@ -100,4 +100,11 @@ public class GoogleCarRouting {
 		
 
 	}
+	
+	public static void main(String[] args) throws Exception {
+	
+		GoogleRouting.carRouting(args);
+	}
+	
+	
 }
