@@ -23,7 +23,7 @@ public class GoogleRouting {
 	 * 
 	 * @param args
 	 * 
-	 * The arguments should be in teh following order:
+	 * The arguments should be in the following order:
 	 * APIKey
 	 * date [year/month/day]
 	 * input file path
@@ -41,7 +41,8 @@ public class GoogleRouting {
 	public static void ptRouting(String[] args, TravelMode mode) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(args[2]));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[3]));
-		
+		writer.write("tripId;travelTime;distance;expectedModeUsed");
+		writer.newLine();
 		GeoApiContext context = new GeoApiContext.Builder()
 			    .apiKey(args[0])
 			    .build();
