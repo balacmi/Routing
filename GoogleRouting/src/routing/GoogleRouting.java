@@ -12,6 +12,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TravelMode;
 
 
@@ -37,7 +38,7 @@ public class GoogleRouting {
 	 * Coordinates should be in WGS84 format
 	 * @throws Exception
 	 */
-	public static void carRouting(String[] args) throws Exception {
+	public static void ptRouting(String[] args, TravelMode mode) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(args[2]));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[3]));
 		
@@ -45,9 +46,9 @@ public class GoogleRouting {
 			    .apiKey(args[0])
 			    .build();
 		
-		String year = args[1].split("\\")[0];
-		String month = args[1].split("\\")[1];
-		String day = args[1].split("\\")[2];
+		String year = args[1].split("/")[0];
+		String month = args[1].split("/")[1];
+		String day = args[1].split("/")[2];
 
 		int indexId = Integer.parseInt(args[4]);
 		int indexStartCoordX = Integer.parseInt(args[5]);
@@ -73,21 +74,46 @@ public class GoogleRouting {
 		
 			double distance = 0.0;		
 			double travelTime = 0.0;
-	
+			//mb: alternatives are not working at the moment aug '17
 			DirectionsRoute[] route = (DirectionsApi.getDirections(context, arr[indexStartCoordX] + " " + arr[indexStartCoordY] ,
-				arr[indexEndCoordX] + " " + arr[indexEndCoordY]).mode(TravelMode.DRIVING).departureTime(time).await()).routes;
+				arr[indexEndCoordX] + " " + arr[indexEndCoordY]).mode(mode).
+					departureTime(time).alternatives(false).await()).routes;
+			
 			if (route == null || route.length == 0) {
-					writer.write(arr[indexId] + ";-99;-99");
+					writer.write(arr[indexId] + ";-99;-99;-99");
 					writer.newLine();
 				}
 			else if (route.length > 0) {
-				for (DirectionsLeg l : route[0].legs) {
-					
-					travelTime += l.duration.inSeconds;
-					distance += l.distance.inMeters;
-				}
+				boolean transit = false;
 				
-				writer.write(arr[indexId] + ";" +  travelTime + ";"+ distance);
+				for (DirectionsLeg l : route[0].legs) {
+					if (mode.name().equals("TRANSIT")) {
+						if (l.steps.length > 1) {
+							
+							int arrSec = l.arrivalTime.getSecondOfDay();
+							
+							if (l.arrivalTime.getDayOfMonth() != Integer.parseInt(day))
+								arrSec += 24 * 3600;
+													
+							travelTime = arrSec - (h * 3600 + min * 60);
+						}
+					}
+					else {
+						travelTime += l.duration.inSeconds;
+						
+					}
+					distance += l.distance.inMeters;
+					
+					//we check if the trip had transit legs
+					for (DirectionsStep ds :l.steps) {
+						
+						if (ds.travelMode.name().equals(mode.name()))
+							transit = true;
+					}
+				}
+				//only the trips that were routed with transit:
+				
+				writer.write(arr[0] + ";" +  travelTime + ";"+ distance + ";" + transit);
 				writer.newLine();
 			}				
 
@@ -96,14 +122,13 @@ public class GoogleRouting {
 				
 		writer.flush();
 		writer.close();
-		reader.close();
-		
+		reader.close();		
 
 	}
 	
 	public static void main(String[] args) throws Exception {
 	
-		GoogleRouting.carRouting(args);
+		GoogleRouting.ptRouting(args, TravelMode.DRIVING);
 	}
 	
 	
