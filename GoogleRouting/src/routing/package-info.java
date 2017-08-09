@@ -4,10 +4,12 @@
  * The input files should be a csv or txt file, with a header and ; separated values.
  * 
  * The output file contains the following information:
- * trip id, travel time, travel distance, true/false if the trip was routed with the requested mode, transfer time, 
- * number of transfers, in-vehicle time
+ * trip id, travel time, travel distance, true/false if the trip was routed with the requested mode
  * 
- * transfer time,  number of transfers, in-vehicle time are only used for transit, for other modes it is set to 0
+ * For pt routing the output file contains the following:
+ * trip id, travel time in seconds,  true/false if the trip was routed with the requested mode
+ * access time in seconds,  waiting time in seconds, transfer time in seconds, number of transfers
+ * in vehicle travel time in seconds and egress time in seconds
  */
 /**
  * @author balacm
