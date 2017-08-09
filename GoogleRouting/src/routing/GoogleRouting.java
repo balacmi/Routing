@@ -157,7 +157,7 @@ public class GoogleRouting {
 					departureTime(time).alternatives(false).await()).routes;
 			
 			if (route == null || route.length == 0) {
-					writer.write(arr[indexId] + "-99;-99;-99;-99;-99;-99;-99;-99;-99");
+					writer.write(arr[indexId] + ";-99;-99;-99;-99;-99;-99;-99;-99;-99");
 					writer.newLine();
 				}
 			else if (route.length > 0) {
@@ -171,31 +171,39 @@ public class GoogleRouting {
 				double firstWaitingTime = 0.0;
 				
 				DirectionsLeg l = route[0].legs[0];
-				if (l.steps[0].travelMode.name().equals("WALKING"))
-					accessTime = l.steps[0].duration.inSeconds;
-				if (l.steps[l.steps.length - 1].travelMode.name().equals("WALKING"))
-					egressTime = l.steps[l.steps.length - 1].duration.inSeconds;
-				for (DirectionsStep ds :l.steps) {
+				if (l.steps.length > 1) {
+				
+					if (l.steps[0].travelMode.name().equals("WALKING"))
+						accessTime = l.steps[0].duration.inSeconds;
+					if (l.steps[l.steps.length - 1].travelMode.name().equals("WALKING"))
+						egressTime = l.steps[l.steps.length - 1].duration.inSeconds;
+					for (DirectionsStep ds :l.steps) {
+						
+						if (ds.travelMode.name().equals("TRANSIT")) {
+							transit = true;
+							transfers++;
+							inVehicleTime += ds.duration.inSeconds;
+							inVehicleDistance += ds.distance.inMeters;
+						}
+								
+					}	
+						
+					transferTime = ((int)(l.arrivalTime.getMillis() - l.departureTime.getMillis())/1000)
+							- egressTime - inVehicleTime; 
+					firstWaitingTime = (l.departureTime.getDayOfMonth() - Integer.parseInt(day))
+							* 24 * 3600 + l.departureTime.getSecondOfDay() - m * 60;
+					travelTime = ((int)(l.arrivalTime.getMillis() - l.departureTime.getMillis())/1000) + firstWaitingTime;
+					writer.write(arr[0] + ";" +  travelTime + ";" + transit
+							 + ";" + accessTime + ";" + firstWaitingTime + ";" + transferTime 
+							 + ";" + transfers + ";" + inVehicleTime + ";" + inVehicleDistance
+							 + ";" + egressTime);
+					writer.newLine();
+				}
+				else {
+					writer.write(arr[indexId] + ";-99;false;-99;-99;-99;-99;-99;-99;-99");
+					writer.newLine();
 					
-					if (ds.travelMode.name().equals("TRANSIT")) {
-						transit = true;
-						transfers++;
-						inVehicleTime += ds.duration.inSeconds;
-						inVehicleDistance += ds.distance.inMeters;
-					}
-							
-				}	
-					
-				transferTime = ((int)(l.arrivalTime.getMillis() - l.departureTime.getMillis())/1000)
-						- egressTime - inVehicleTime; 
-				firstWaitingTime = (l.departureTime.getDayOfMonth() - Integer.parseInt(day))
-						* 24 * 3600 + l.departureTime.getSecondOfDay() - m * 60;
-				travelTime = ((int)(l.arrivalTime.getMillis() - l.departureTime.getMillis())/1000) + firstWaitingTime;
-				writer.write(arr[0] + ";" +  travelTime + ";" + transit
-						 + ";" + accessTime + ";" + firstWaitingTime + ";" + transferTime 
-						 + ";" + transfers + ";" + inVehicleTime + ";" + inVehicleDistance
-						 + ";" + egressTime);
-				writer.newLine();
+				}
 			}				
 
 			s = reader.readLine();
@@ -210,7 +218,9 @@ public class GoogleRouting {
 	public static void main(String[] args) throws Exception {
 	
 		GoogleRouting.ptRouting(args);
-	}
-	
+		
+		//GoogleRouting.carbikewalkRouting(args, TravelMode.DRIVING);
+		
+	}	
 	
 }
