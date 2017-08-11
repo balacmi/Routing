@@ -29,13 +29,15 @@ public class GoogleRouting {
 	 * input file path
 	 * output file path
 	 * index of trip id [first column index is 0]
-	 * startCoord X index
-	 * startCoord Y index
-	 * endCoord X index
-	 * endCoord Y index
+	 * start latitude index
+	 * start longitude index
+	 * end latitude index
+	 * end longitude index
 	 * index of start time in minutes
 	 * 
 	 * Coordinates should be in WGS84 format
+	 * latitude and longitude GPS coordinates
+	 * example of a valid coordiante in Switzerland: 47.3 8.7 
 	 * @throws Exception
 	 */
 	public static void carbikewalkRouting(String[] args, TravelMode mode) throws Exception {
