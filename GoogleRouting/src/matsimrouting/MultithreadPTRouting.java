@@ -154,7 +154,6 @@ public class MultithreadPTRouting {
 		}
 		
 		public void run() {
-			System.out.println(this.stringToProcess);
 			int timeStep = 60;
 		    PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
@@ -201,7 +200,6 @@ public class MultithreadPTRouting {
 			
 			double departureTime = m *60 + ((Leg)route.get(0)).getTravelTime();
 			
-			System.out.println(departureTime);
 			double travelTime = this.getTraveltime(route);			
 			int numberOfTransfers = this.getNumberOfTransfers(route);
 			
