@@ -39,6 +39,28 @@ import com.google.inject.Provider;
 
 public class MultithreadPTRouting {
 
+	/**
+	 * 
+	 * This method routes trips between od pairs with public transport.
+	 * 
+	 * It expects the following as in an input:
+	 * list of arguments in the following order:
+	 * 1. Input file path
+	 * 2. Input network path.
+	 * 3. Transit schedule path
+	 * 4. Transit vehicles path.
+	 * 5. Number of threads to use.
+	 * 6. Output path for routes file
+	 * 7. Output path for frequency file.
+	 * 8. Output path for non-routed trips file.
+	 * 9. Comma separated list of column numbers representing the following variables from the
+	 * input file path:
+	 *  index of tripId, index of start latitude, index of start longitude,
+	 *  index of end latitude, index of end longitude, index of start time in minutes
+	 *  
+	 *  Coordinate systems used must be the same through all the input files!
+	 * 
+	 */
 	public static void main(String[] args) throws IOException {
 		
 		MultithreadPTRouting mt = new MultithreadPTRouting();
