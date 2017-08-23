@@ -33,11 +33,13 @@ public class GoogleRouting {
 	 * start longitude index
 	 * end latitude index
 	 * end longitude index
+	 * waypoints latitude index
+	 * waypoints longitude index
 	 * index of start time in minutes
 	 * 
 	 * Coordinates should be in WGS84 format
 	 * latitude and longitude GPS coordinates
-	 * example of a valid coordiante in Switzerland: 47.3 8.7 
+	 * example of a valid coordinate in Switzerland: 47.3 8.7 
 	 * @throws Exception
 	 */
 	public static void carbikewalkRouting(String[] args, TravelMode mode) throws Exception {
@@ -58,7 +60,9 @@ public class GoogleRouting {
 		int indexStartCoordY = Integer.parseInt(args[6]);
 		int indexEndCoordX = Integer.parseInt(args[7]);
 		int indexEndCoordY = Integer.parseInt(args[8]);
-		int indexTime = Integer.parseInt(args[9]);
+		int indexWaypointsX = Integer.parseInt(args[9]);
+		int indexWaypointsY = Integer.parseInt(args[10]);
+		int indexTime = Integer.parseInt(args[11]);
 
 		reader.readLine();
 		String s = reader.readLine();
@@ -78,8 +82,17 @@ public class GoogleRouting {
 			double distance = 0.0;		
 			double travelTime = 0.0;
 			//mb: alternatives are not working at the moment aug '17
+			
+			String[] waypointsX = arr[indexWaypointsX].split(",");
+			String[] waypointsY = arr[indexWaypointsY].split(",");
+			String[] waypoints = new String[waypointsX.length];
+			for(int i = 0; i < waypointsX.length; i++) {
+				
+				waypoints[i] = waypointsX + ", " + waypointsY;
+			}
+			
 			DirectionsRoute[] route = (DirectionsApi.getDirections(context, arr[indexStartCoordX] + " " + arr[indexStartCoordY] ,
-				arr[indexEndCoordX] + " " + arr[indexEndCoordY]).mode(mode).
+				arr[indexEndCoordX] + " " + arr[indexEndCoordY]).mode(mode).waypoints(waypoints).
 					departureTime(time).alternatives(false).await()).routes;
 			
 			if (route == null || route.length == 0) {
