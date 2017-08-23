@@ -219,8 +219,12 @@ public class GoogleRouting {
 	
 	public static void main(String[] args) throws Exception {
 	
+		//pt routing
 		GoogleRouting.ptRouting(args);
 		
+		//all other kinds of rounting
+		//second argument passed to this method
+		//defines the mode to be used
 		//GoogleRouting.carbikewalkRouting(args, TravelMode.DRIVING);
 		
 	}	

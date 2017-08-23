@@ -41,9 +41,9 @@ public class MultithreadPTRouting {
 
 	/**
 	 * 
-	 * This method routes trips between od pairs with public transport.
+	 * This method routes trips between OD pairs with public transport.
 	 * 
-	 * It expects the following as in an input:
+	 * It expects the following as an input:
 	 * list of arguments in the following order:
 	 * 1. Input file path
 	 * 2. Input network path.
@@ -115,6 +115,9 @@ public class MultithreadPTRouting {
 		}
 	        // Wait until all threads are finish
 		final BufferedWriter outLinkR = IOUtils.getBufferedWriter(args[5]);
+		outLinkR.write("householdid;tripid;traveltime;departuretime;accesstime;egresstime;waitingtime;transfertime;"
+				+ "numberoftransfers;invehicledistance");
+		outLinkR.newLine();
 		for (RouteData routeData : rd) {
 			
 			outLinkR.write(routeData.toString());
@@ -124,6 +127,8 @@ public class MultithreadPTRouting {
 		outLinkR.close();
 		
 		final BufferedWriter outLinkF = IOUtils.getBufferedWriter(args[6]);
+		outLinkF.write("housholdid;tripid;frequncy[sec]");
+		outLinkF.newLine();
 		for (FrequencyData frequencyData : fd) {
 			
 			outLinkF.write(frequencyData.toString());
@@ -133,6 +138,8 @@ public class MultithreadPTRouting {
 		outLinkF.close();
 		
 		final BufferedWriter outLinkW = IOUtils.getBufferedWriter(args[7]);
+		outLinkW.write("householdid;tripid;traveltime");
+		outLinkW.newLine();
 		for (WalkData walkData : wd) {
 			
 			outLinkW.write(walkData.toString());
@@ -399,10 +406,8 @@ public class MultithreadPTRouting {
 					
 					travelTime += ((Leg) pe).getTravelTime();
 					
-				}
-				
-			}		
-			
+				}				
+			}				
 			return travelTime;
 		}
 			
@@ -426,13 +431,9 @@ public class MultithreadPTRouting {
 						((Leg)route.get(0)).getDepartureTime() + getTraveltime(route) && getNumberOfTransfers(r) == getNumberOfTransfers(route)) {
 					
 					
-					return true;
-					
-				}
-				
-			}
-			
-			
+					return true;					
+				}				
+			}			
 			return false;
 		}
 		public boolean isDominatedWithoutTran(List<? extends PlanElement> route, ArrayList<List<? extends PlanElement>> allRoutes) {
@@ -443,16 +444,10 @@ public class MultithreadPTRouting {
 						((Leg)route.get(0)).getDepartureTime() + getTraveltime(route)) {
 					
 					
-					return true;
-					
-				}
-				
-			}
-			
-			
+					return true;					
+				}				
+			}			
 			return false;
-		}
-		
+		}		
 	}
-
 }
