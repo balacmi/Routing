@@ -25,10 +25,11 @@ public class GoogleRouting {
 	 * 
 	 * The arguments should be in the following order:
 	 * APIKey
-	 * date [year/month/day]
+	 * 
 	 * input file path
 	 * output file path
 	 * index of trip id [first column index is 0]
+	 * index of the date for the routing
 	 * start latitude index
 	 * start longitude index
 	 * end latitude index
@@ -37,25 +38,26 @@ public class GoogleRouting {
 	 * waypoints longitude index
 	 * index of start time in minutes
 	 * 
+	 * 
 	 * Coordinates should be in WGS84 format
 	 * latitude and longitude GPS coordinates
 	 * example of a valid coordinate in Switzerland: 47.3 8.7 
 	 * @throws Exception
 	 */
 	public static void carbikewalkRouting(String[] args, TravelMode mode) throws Exception {
-		BufferedReader reader = new BufferedReader(new FileReader(args[2]));
-		BufferedWriter writer = new BufferedWriter(new FileWriter(args[3]));
+		BufferedReader reader = new BufferedReader(new FileReader(args[1]));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(args[2]));
 		writer.write("tripId;travelTime;distance;expectedModeUsed");
 		writer.newLine();
 		GeoApiContext context = new GeoApiContext.Builder()
 			    .apiKey(args[0])
 			    .build();
 		
-		String year = args[1].split("/")[0];
-		String month = args[1].split("/")[1];
-		String day = args[1].split("/")[2];
+		String year = args[4].split("/")[0];
+		String month = args[4].split("/")[1];
+		String day = args[4].split("/")[2];
 
-		int indexId = Integer.parseInt(args[4]);
+		int indexId = Integer.parseInt(args[3]);
 		int indexStartCoordX = Integer.parseInt(args[5]);
 		int indexStartCoordY = Integer.parseInt(args[6]);
 		int indexEndCoordX = Integer.parseInt(args[7]);
@@ -132,7 +134,7 @@ public class GoogleRouting {
 	public static void ptRouting(String[] args) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(args[2]));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[3]));
-		writer.write("tripId;travelTime;expectedModeUsed;accessTime;waitingTime;transferTime;transfers;inVehicleTime;inVehicleDistance;egressTime");
+		writer.write("tripId;travelTime;expectedModeUsed;accessTime;waitingTime;transferTime;transfers;inVehicleTime;inVehicleDistance;egressTime;types;shortNames;names;numberOfStops");
 		writer.newLine();
 		GeoApiContext context = new GeoApiContext.Builder()
 			    .apiKey(args[0])
@@ -192,11 +194,23 @@ public class GoogleRouting {
 						accessTime = l.steps[0].duration.inSeconds;
 					if (l.steps[l.steps.length - 1].travelMode.name().equals("WALKING"))
 						egressTime = l.steps[l.steps.length - 1].duration.inSeconds;
+					
+					String vehicleTypes = "";
+					String numberOfStops = "";
+					String shortNames = "";
+					String names = "";
 					for (DirectionsStep ds :l.steps) {
 						
 						if (ds.travelMode.name().equals("TRANSIT")) {
 							transit = true;
 							transfers++;
+							if (ds.transitDetails.line.vehicle.type != null)
+								vehicleTypes += (ds.transitDetails.line.vehicle.type.toString() + ",");
+							else
+								vehicleTypes += ("NA" + ",");
+							shortNames += ds.transitDetails.line.shortName + ",";
+							names += ds.transitDetails.line.vehicle.name + ",";
+							numberOfStops += (ds.transitDetails.numStops + ",");
 							inVehicleTime += ds.duration.inSeconds;
 							inVehicleDistance += ds.distance.inMeters;
 						}
@@ -211,7 +225,8 @@ public class GoogleRouting {
 					writer.write(arr[0] + ";" +  travelTime + ";" + transit
 							 + ";" + accessTime + ";" + firstWaitingTime + ";" + transferTime 
 							 + ";" + transfers + ";" + inVehicleTime + ";" + inVehicleDistance
-							 + ";" + egressTime);
+							 + ";" + egressTime + ";" + vehicleTypes + ";" + shortNames
+							 + ";" + names + ";" + numberOfStops);
 					writer.newLine();
 				}
 				else {
